@@ -10,7 +10,7 @@ import os
 import tempfile
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from langchain_community.document_loaders import UnstructuredHTMLLoader
+from langchain_community.document_loaders import BSHTMLLoader  # <-- Swapped to lightweight BeautifulSoup
 from langchain_core.runnables import RunnablePassthrough
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_chroma import Chroma
@@ -45,7 +45,8 @@ if uploaded_file and st.session_state.rag_chain is None:
             tmp_file.write(uploaded_file.getvalue())
             tmp_file_path = tmp_file.name
         try:
-            loader = UnstructuredHTMLLoader(file_path=tmp_file_path)
+            # Using the new, error-free loader
+            loader = BSHTMLLoader(file_path=tmp_file_path)
             docs = loader.load()
             splits = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200).split_documents(docs)
             vectorstore = Chroma.from_documents(documents=splits, embedding=OpenAIEmbeddings(model="text-embedding-3-small"))
